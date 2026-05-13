@@ -43,7 +43,7 @@ $$Score = \left( \frac{Escalabilidade \times Alinhamento \times Impacto \times C
 Clone o repositório e instale as dependências:
 ```bash
 # Clone o projeto
-git clone https://github.com/Lorivan/meu-app-po.git
+git clone https://github.com/Lorivan/Prioriza
 
 # Acesse a pasta
 cd analisador-discovery
