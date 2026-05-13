@@ -1,0 +1,38 @@
+# 🚀 Product Opportunity Analyzer (WMS/TMS & Portals)
+
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Product Management](https://img.shields.io/badge/Product-Management-blue?style=for-the-badge)
+
+## 📋 Descrição
+Este aplicativo é uma ferramenta estratégica de **Product Discovery** projetada para transformar solicitações brutas de clientes e consultores em decisões baseadas em dados.
+
+Utilizando uma adaptação do framework **RICE** e elementos do **Modelo Kano**, o analisador remove o viés emocional da priorização, focando em escalabilidade, esforço técnico e alinhamento com o roadmap do produto.
+
+## ✨ Funcionalidades
+- **Análise Quantitativa:** Cálculo de score baseado em Impacto, Confiança e Esforço.
+- **Contexto de Negócio:** Avaliação de impacto em contas estratégicas (Key Accounts) e risco de Churn.
+- **Benchmarking:** Campo dedicado para análise comparativa com o mercado.
+- **Memória de Cálculo:** Transparência total sobre como o score foi gerado.
+- **Resumo Executivo:** Tabela formatada para fácil compartilhamento e registro em ferramentas de gestão (Jira, Notion, Azure DevOps).
+
+## 🧮 Metodologia de Cálculo
+A priorização segue a fórmula:
+
+**Score Final = [(E * A * I * C) / Esforço] * Multiplicadores**
+
+Onde:
+- **E (Escalabilidade):** O quanto essa função serve para outros clientes.
+- **A (Alinhamento):** Fit com a visão de futuro do produto.
+- **I (Impacto):** Redução de esforço para o usuário final.
+- **C (Confiança):** Grau de certeza sobre os dados (Baixa: 0.5 | Média: 0.8 | Alta: 1.0).
+- **Esforço Técnico:** Complexidade mapeada em escala (Baixa: 1 | Média: 5 | Alta: 10).
+- **Multiplicadores:** Bônus estratégico para clientes Tier 1 ou risco iminente de cancelamento.
+
+## 🚀 Como Executar
+
+### Pré-requisitos
+- Python 3.8 ou superior
+- Pip (Gerenciador de pacotes)
+
+### Instalação
