@@ -43,7 +43,7 @@ $$Score = \left( \frac{Escalabilidade \times Alinhamento \times Impacto \times C
 Clone o repositório e instale as dependências:
 ```bash
 # Clone o projeto
-git clone https://github.com/seu-usuario/analisador-discovery.git
+git clone https://github.com/Lorivan/meu-app-po.git
 
 # Acesse a pasta
 cd analisador-discovery
