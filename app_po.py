@@ -1,6 +1,16 @@
 import streamlit as st
 import pandas as pd
 
+
+# --- FUNÇÃO PARA INICIALIZAR O ESTADO ---
+def inicializar_estado():
+    if 'avaliacoes' not in st.session_state:
+        st.session_state.avaliacoes = []
+
+
+# --- CHAMADA DA FUNÇÃO DE INICIALIZAÇÃO ---
+inicializar_estado()
+
 # Configuração da Interface
 st.set_page_config(page_title="RICE Priority Pro", layout="wide", page_icon="🚀")
 
@@ -17,6 +27,11 @@ st.markdown("""
         background-color: #4F46E5;
         color: white;
         font-weight: bold;
+    }
+    .st-emotion-cache-1avcm0n { /* Classe do st.metric */
+        border: 1px solid #e1e1e1;
+        border-radius: 10px;
+        padding: 15px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -51,14 +66,15 @@ st.header("1. Detalhamento da Oportunidade")
 col_desc1, col_desc2 = st.columns(2)
 
 with col_desc1:
-    raw_input = st.text_area("Descrição da Demanda", placeholder="O que precisa ser feito?")
-    justificativa = st.text_area("Justificativa e Recomendação", placeholder="Por que fazer isso agora?")
+    demanda_input = st.text_area("Descrição da Demanda", placeholder="O que precisa ser feito?", key="demanda")
+    justificativa = st.text_area("Justificativa e Recomendação", placeholder="Por que fazer isso agora?",
+                                 key="justificativa")
 
 with col_desc2:
     st.markdown("**🔍 Validação de Mercado**")
     comparativo = st.text_area("Comparativo com Mercado",
-                               placeholder="Ex: O concorrente X já possui essa feature nativa.")
-    referencia = st.text_input("Referência / Link do Benchmarking", placeholder="https://...")
+                               placeholder="Ex: O concorrente X já possui essa feature nativa.", key="comparativo")
+    referencia = st.text_input("Referência / Link do Benchmarking", placeholder="https://...", key="referencia")
     st.caption("Use esta seção para embasar sua nota de 'Confiança' abaixo.")
 
 st.markdown("---")
@@ -74,48 +90,83 @@ with c3:
     confianca_map = {"Baixa": 0.5, "Média": 0.8, "Alta": 1.0}
     val_confianca = confianca_map[confianca_label]
 with c4:
-    esforco_label = st.select_slider("Esforço Técnico", options=["Baixa", "Média", "Alta"], value="Média")
-    esforco_map = {"Baixa": 1, "Média": 5, "Alta": 10}
+    # A EVOLUÇÃO QUE VOCÊ SUGERIU!
+    esforco_label = st.select_slider(
+        "Esforço Técnico",
+        options=["Muito Baixo", "Baixo", "Médio", "Alto", "Muito Alto"],
+        value="Médio",
+        help="Estimativa do tempo/recursos. Inspirado em T-shirt Sizing (PP, P, M, G, GG)."
+    )
+    esforco_map = {"Muito Baixo": 1, "Baixo": 3, "Médio": 5, "Alto": 8, "Muito Alto": 13}
     val_esforco = esforco_map[esforco_label]
 
 # --- CÁLCULO ---
-# RICE = (Reach * Impact * Confidence) / Effort
 score_base = (reach * impact * val_confianca) / val_esforco
 score_final = score_base * fator_perfil * fator_churn
 
 st.markdown("---")
 
-if st.button("📊 AVALIAR OPORTUNIDADE"):
-    #st.balloons()
+if st.button("📊 AVALIAR E ADICIONAR À LISTA"):
+    if not demanda_input:
+        st.error("Por favor, preencha a 'Descrição da Demanda' antes de avaliar.")
+    else:
+        # st.balloons()
+        res_col1, res_col2 = st.columns([1, 1])
 
-    res_col1, res_col2 = st.columns([1, 1])
+        with res_col1:
+            st.subheader("⚖️ Veredito")
+            if score_final >= 8:
+                st.metric(label="Status da Demanda", value="CRÍTICA", delta=f"{score_final:.2f} Score")
+                st.success("Mover para o topo do backlog imediatamente.")
+            elif score_final >= 3:
+                st.metric(label="Status da Demanda", value="VÁLIDA", delta=f"{score_final:.2f} Score",
+                          delta_color="off")
+                st.warning("Planejar para os próximos ciclos.")
+            else:
+                st.metric(label="Status da Demanda", value="BAIXA", delta=f"{score_final:.2f} Score",
+                          delta_color="inverse")
+                st.error("Considerar descarte ou reavaliação futura.")
 
-    with res_col1:
-        st.subheader("⚖️ Veredito")
-        if score_final >= 50:
-            st.success(
-                f"### PRIORIDADE CRÍTICA\n**Score: {score_final:.2f}**\n\nMover para o topo do backlog imediatamente.")
-        elif score_final >= 20:
-            st.warning(f"### OPORTUNIDADE VÁLIDA\n**Score: {score_final:.2f}**\n\nPlanejar para os próximos ciclos.")
-        else:
-            st.error(f"### BAIXA PRIORIDADE\n**Score: {score_final:.2f}**\n\nCusto técnico maior que o valor gerado.")
+        with res_col2:
+            st.subheader("🧮 Memória de Cálculo")
+            st.code(f"""
+            (Alcance: {reach} * Impacto: {impact} * Confiança: {val_confianca}) / Esforço: {val_esforco} ({esforco_label})
+            Score Base = {score_base:.2f}
+            Multiplicador Perfil: x{fator_perfil} ({perfil_cliente})
+            Multiplicador Churn: x{fator_churn}
+            ---------------------------
+            Score Final = {score_final:.2f}
+            """)
 
-    with res_col2:
-        st.subheader("🧮 Memória de Cálculo")
-        st.code(f"""
-        (Alcance: {reach} * Impacto: {impact} * Confiança: {val_confianca}) / Esforço: {val_esforco}
-        Score Base = {score_base:.2f}
-        Multiplicador Perfil: x{fator_perfil}
-        Multiplicador Churn: x{fator_churn}
-        ---------------------------
-        Score Final = {score_final:.2f}
-        """)
+        # Adicionar a avaliação ao histórico no st.session_state
+        nova_avaliacao = {
+            "Demanda": demanda_input,
+            "Score Final": f"{score_final:.2f}",
+            "Cliente": cliente_nome or "N/A",
+            "Perfil": perfil_cliente,
+            "Churn": "Sim" if ameaca_churn else "Não",
+            "Alcance": reach,
+            "Impacto": impact,
+            "Confiança": confianca_label,
+            "Esforço": esforco_label,
+        }
+        st.session_state.avaliacoes.append(nova_avaliacao)
 
-    # Tabela Resumo
-    st.markdown("### 📋 Resumo para Registro")
-    resumo_data = {
-        "Atributo": ["Cliente", "Perfil", "Risco Churn", "Confiança", "Score Final"],
-        "Valor": [cliente_nome or "Não informado", perfil_cliente, "Sim" if ameaca_churn else "Não", confianca_label,
-                  f"{score_final:.2f}"]
-    }
-    st.table(pd.DataFrame(resumo_data))
+# --- EXIBIÇÃO DO HISTÓRICO DE AVALIAÇÕES ---
+if st.session_state.avaliacoes:
+    st.markdown("---")
+    st.header("📋 Histórico de Priorização")
+
+    df_avaliacoes = pd.DataFrame(st.session_state.avaliacoes)
+
+    # Ordenar por Score Final (convertendo para float antes)
+    df_avaliacoes['Score Final'] = df_avaliacoes['Score Final'].astype(float)
+    df_avaliacoes = df_avaliacoes.sort_values(by="Score Final", ascending=False).reset_index(drop=True)
+    df_avaliacoes.index += 1  # Começar o índice em 1
+
+    st.dataframe(df_avaliacoes, use_container_width=True)
+
+    # Botão para limpar a lista
+    if st.button("🗑️ Limpar Histórico"):
+        st.session_state.avaliacoes = []
+        st.rerun()
